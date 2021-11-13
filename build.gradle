@@ -1,0 +1,27 @@
+plugins {
+    id 'groovy'
+    id 'maven'
+}
+
+group 'site.zbyte.root'
+version '2.11'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation localGroovy()
+    implementation gradleApi()
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            pom.groupId = "site.zbyte.root"
+            pom.artifactId = "zroot-builder"
+            pom.version = "${version}"
+            repository(url: uri('./build/repo'))
+        }
+    }
+}
