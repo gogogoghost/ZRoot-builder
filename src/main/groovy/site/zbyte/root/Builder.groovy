@@ -85,7 +85,7 @@ class Builder implements Plugin<Project>{
         }
     }
 
-    static class RootDriver{
+    static class ZRootConf{
         String mainClass=""
         ArrayList<String> localFilter=new ArrayList<>()
         HashMap<String,ArrayList<String>> otherFilter=new HashMap<>()
@@ -111,7 +111,7 @@ class Builder implements Plugin<Project>{
     @Override
     void apply(Project project) {
 
-        def ext=project.extensions.create('rootDriver',RootDriver)
+        def ext=project.extensions.create('zRoot',ZRootConf)
 
         String baseFileDir=project.buildDir.path+'/tmp/runner'
         String clsTmpDir=project.buildDir.path+'/tmp/remote/'
