@@ -1,7 +1,5 @@
 # ZRoot-builder
-Easy to use root on Android. For calling system service and more.
-
-Extension of [ZRoot](https://github.com/gogogoghost/ZRoot) for running custom code(service) on remote root process
+ZRoot-builder is a extension of [ZRoot](https://github.com/gogogoghost/ZRoot) for running custom code(service) on remote root process.
 
 ## Usage
 
@@ -53,13 +51,14 @@ zRoot{
 }
 ```
 
-Make sure that filter includes all class the main class need
-Remote classes currently only supports JAVA language
+Make sure the filter includes all classes the main class needs.
 
-Get instance by ZRoot
+Remote classes currently only supports **JAVA language.**
+
+Get the instance by ZRoot: 
 
 ```kotlin
-val zRoot=ZRoot(this)
+val zRoot = ZRoot(this)
 zRoot.start(5000) {
     if (!it)
         return@start
