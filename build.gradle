@@ -1,10 +1,7 @@
 plugins {
     id 'groovy'
-    id 'maven'
+    id 'maven-publish'
 }
-
-group 'site.zbyte.root'
-version '2.11'
 
 repositories {
     mavenCentral()
@@ -15,13 +12,15 @@ dependencies {
     implementation gradleApi()
 }
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            pom.groupId = "site.zbyte.root"
-            pom.artifactId = "zroot-builder"
-            pom.version = "${version}"
-            repository(url: uri('./build/repo'))
+afterEvaluate {
+    publishing {
+        publications {
+            maven(MavenPublication){
+                groupId = 'site.zbyte'
+                artifactId = 'zroot-builder'
+                version '2.11'
+                from components.java
+            }
         }
     }
 }
