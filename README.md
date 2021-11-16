@@ -1,16 +1,28 @@
 # ZRoot-builder
+[![](https://jitpack.io/v/site.zbyte/zroot-builder.svg)](https://jitpack.io/#site.zbyte/zroot-builder)
+
 ZRoot-builder is a extension of [ZRoot](https://github.com/gogogoghost/ZRoot) for running custom code(service) on remote root process.
 
+**Only Support Gradle 7.X**
+
 ## Usage
+
+Add it in your root build.gradle at the end of repositories:
+
+```css
+allprojects {
+    repositories {
+        ...
+        maven { url 'https://jitpack.io' }
+    }
+}
+```
 
 Add classpath into root build.gradle
 
 ```groovy
 dependencies{
-    /**
-     * waiting to publish to maven...
-     */
-    classpath "site.zbyte.root:zroot-builder:${version}"
+    classpath "site.zbyte:zroot-builder:${version}"
 }
 ```
 
