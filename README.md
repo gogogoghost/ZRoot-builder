@@ -70,9 +70,8 @@ Remote classes currently only supports **JAVA language.**
 Get the instance by ZRoot: 
 
 ```kotlin
-val zRoot = ZRoot(this)
-zRoot.start(5000) {
-    if (!it)
+ZRoot.Starter(context).start(5000) {zRoot->
+    if (zRoot==null)
         return@start
 
     /**
