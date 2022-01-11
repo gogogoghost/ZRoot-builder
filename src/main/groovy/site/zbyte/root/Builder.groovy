@@ -225,7 +225,7 @@ class Builder implements Plugin<Project>{
             //打包整个远端类
             project.tasks.create('buildRemoteJar',Jar.class){jar->
                 dependsOn('copyRemoteClass')
-                jar.archiveBaseName.set("remote")
+                jar.archiveFileName.set("remote.jar")
                 doFirst {
                     jar.from(clsTmpDir)
                 }
@@ -236,6 +236,7 @@ class Builder implements Plugin<Project>{
             project.tasks.create('buildRunnerJar',Jar.class){jar->
                 mustRunAfter('cleanJar')
                 dependsOn(['copyBaseRunnerFileToBuild','buildRemoteJar'])
+                jar.archiveFileName.set(project.name+'.jar')
                 doFirst {
                     jar.manifest{manifest->
                         Map<String,?> attrs=new HashMap<>()
