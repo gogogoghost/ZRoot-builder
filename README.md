@@ -63,6 +63,16 @@ zRoot{
 }
 ```
 
+Upgrade **sourceSets** let the generated dex file could be packed
+
+```groovy
+sourceSets {
+    main {
+        assets.srcDirs = [buildDir.path+'/assets']
+    }
+}
+```
+
 Make sure the filter includes all classes the main class needs.
 
 Remote classes currently only supports **JAVA language.**
