@@ -3,7 +3,9 @@
 
 ZRoot-builder is a extension of [ZRoot](https://github.com/gogogoghost/ZRoot) for running custom code(service) on remote root process.
 
-**Only Support Gradle 7.X**
+Support gradle plugin version:
+- 7.X
+- 8.0.2 (tested)
 
 ## Usage
 
