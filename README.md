@@ -41,20 +41,23 @@ Add Config at the blank place of build.gradle
 ```groovy
 zRoot{
     /**
-     * which service class you need run on remote process
-     * it must be a binder
+     * which service class you need run on remote process.
+     * it must be a binder.
      */
     mainClass("site.zbyte.root.app.remote.Worker")
     /**
-     * which classes you need to pack into remote process
-     * for example, dependencies of main class
+     * which classes you need to pack into remote process.
+     * for example, dependencies of main class.
+     * it's a regex string array.
+     * these classes will be packed into a jar and compile to dex.
+     * if you are using kotlin, recommend you keep these classes sources written in java.
      */
     filter([
             "site/zbyte/root/app/remote/.*",
             "site/zbyte/root/app/IWorker.*"
     ])
     /**
-     * you can also include classes from other module of current project
+     * you can also include classes from other module of current project.
      */
     filter(
             ":other",
@@ -65,7 +68,7 @@ zRoot{
 }
 ```
 
-Upgrade **sourceSets** let the generated dex file could be packed
+Make sure that **sourceSets** contains the generated dex file
 
 ```groovy
 sourceSets {
