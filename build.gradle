@@ -17,14 +17,9 @@ afterEvaluate {
         publications {
             maven(MavenPublication){
                 groupId = 'site.zbyte'
-                artifactId = 'zroot-builder'
-                version '2.11'
+                artifactId = 'zroot-builder-test'
+                version '3.1.6'
                 from components.java
-            }
-        }
-        repositories {
-            maven {
-                url "$buildDir/repo"
             }
         }
     }

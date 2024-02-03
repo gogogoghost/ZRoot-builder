@@ -15,7 +15,7 @@ import java.util.regex.Pattern
 
 class Builder implements Plugin<Project>{
 
-    boolean isRelease(Project project){
+    static boolean isRelease(Project project){
         project.gradle.startParameter.taskNames
         for(String s : project.gradle.startParameter.taskNames) {
             if (s.contains("Release") | s.contains("release")) {
@@ -25,22 +25,22 @@ class Builder implements Plugin<Project>{
         return false
     }
 
-    String buildType(Project project){
+    static String buildType(Project project){
         return isRelease(project)?'release':'debug'
     }
 
-    String buildTypeUpper(Project project){
+    static String buildTypeUpper(Project project){
         return isRelease(project)?'Release':'Debug'
     }
 
-    void copyStreamToFile(InputStream input,String path){
+    static void copyStreamToFile(InputStream input, String path){
         def f=new File(path)
         def fParent=f.parentFile
         if(!fParent.exists())
             fParent.mkdirs()
         def output=new FileOutputStream(f)
         def buf=new byte[1024]
-        def size=0
+        def size
         while((size=input.read(buf))>0){
             output.write(buf,0,size)
         }
@@ -79,7 +79,7 @@ class Builder implements Plugin<Project>{
         }
     }
 
-    void cleanFile(File file){
+    static void cleanFile(File file){
         if(file.exists()){
             file.delete()
         }
@@ -135,65 +135,65 @@ class Builder implements Plugin<Project>{
             def assetsSrc=project.extensions.getByName('android').getProperties()['sourceSets']['main']['assets']['source']
             assetsSrc.add(project.buildDir.path+'/assets')
 
-            project.task('copyBaseRunnerFileToBuild'){
-                if(ext.debugModule!=null){
-                    dependsOn(ext.debugModule+":syncReleaseLibJars")
+            project.tasks.register('copyBaseRunnerFileToBuild') {
+                if (ext.debugModule != null) {
+                    dependsOn(ext.debugModule + ":syncReleaseLibJars")
                 }
                 doLast {
                     //写入jar
                     cleanFile(new File(baseRunnerPath))
-                    if(ext.debugModule==null){
-                        copyStreamToFile(this.class.getResource('/runner.jar').openStream(),baseRunnerPath)
-                    }else{
-                        File src=new File(project.rootProject.project(ext.debugModule).buildDir.path+"/intermediates/aar_main_jar/release/classes.jar")
-                        def input=new FileInputStream(src)
-                        copyStreamToFile(input,baseRunnerPath)
+                    if (ext.debugModule == null) {
+                        copyStreamToFile(this.class.getResource('/runner.jar').openStream(), baseRunnerPath)
+                    } else {
+                        File src = new File(project.rootProject.project(ext.debugModule).buildDir.path + "/intermediates/aar_main_jar/release/classes.jar")
+                        def input = new FileInputStream(src)
+                        copyStreamToFile(input, baseRunnerPath)
                     }
                     //写入RemoteClass
-                    def remoteClassFileObj=new File(remoteClassFile)
-                    def contentBytes="yv66vgAAADQAFQoAAwARBwASBwATAQALUmVtb3RlQ2xhc3MBABJMamF2YS9sYW5nL1N0cmluZzsBAA1Db25zdGFudFZhbHVlCAAUAQAGPGluaXQ+AQADKClWAQAEQ29kZQEAD0xpbmVOdW1iZXJUYWJsZQEAEkxvY2FsVmFyaWFibGVUYWJsZQEABHRoaXMBABhMc2l0ZS96Ynl0ZS9yb290L0NvbmZpZzsBAApTb3VyY2VGaWxlAQALQ29uZmlnLmphdmEMAAgACQEAFnNpdGUvemJ5dGUvcm9vdC9Db25maWcBABBqYXZhL2xhbmcvT2JqZWN0AQABJQAhAAIAAwAAAAEAGQAEAAUAAQAGAAAAAgAHAAEAAQAIAAkAAQAKAAAALwABAAEAAAAFKrcAAbEAAAACAAsAAAAGAAEAAAADAAwAAAAMAAEAAAAFAA0ADgAAAAEADwAAAAIAEA=="
-                    def bytes=Base64.getDecoder().decode(contentBytes)
-                    int index=-1
-                    for(int i=0;i<bytes.size();i++){
+                    def remoteClassFileObj = new File(remoteClassFile)
+                    def contentBytes = "yv66vgAAADQAFQoAAwARBwASBwATAQALUmVtb3RlQ2xhc3MBABJMamF2YS9sYW5nL1N0cmluZzsBAA1Db25zdGFudFZhbHVlCAAUAQAGPGluaXQ+AQADKClWAQAEQ29kZQEAD0xpbmVOdW1iZXJUYWJsZQEAEkxvY2FsVmFyaWFibGVUYWJsZQEABHRoaXMBABhMc2l0ZS96Ynl0ZS9yb290L0NvbmZpZzsBAApTb3VyY2VGaWxlAQALQ29uZmlnLmphdmEMAAgACQEAFnNpdGUvemJ5dGUvcm9vdC9Db25maWcBABBqYXZhL2xhbmcvT2JqZWN0AQABJQAhAAIAAwAAAAEAGQAEAAUAAQAGAAAAAgAHAAEAAQAIAAkAAQAKAAAALwABAAEAAAAFKrcAAbEAAAACAAsAAAAGAAEAAAADAAwAAAAMAAEAAAAFAA0ADgAAAAEADwAAAAIAEA=="
+                    def bytes = Base64.getDecoder().decode(contentBytes)
+                    int index = -1
+                    for (int i = 0; i < bytes.size(); i++) {
                         //搜索%号
-                        if(bytes[i]==0x25){
-                            index=i
+                        if (bytes[i] == 0x25) {
+                            index = i
                             break
                         }
                     }
-                    if(index==-1)
+                    if (index == -1)
                         throw new Exception("Find % in config file error")
 
-                    def parent=remoteClassFileObj.parentFile
-                    if(!parent.exists())
+                    def parent = remoteClassFileObj.parentFile
+                    if (!parent.exists())
                         parent.mkdirs()
-                    def mainClass=ext.mainClass
-                    def output=new FileOutputStream(remoteClassFileObj)
+                    def mainClass = ext.mainClass
+                    def output = new FileOutputStream(remoteClassFileObj)
                     //写入到index-1位置
-                    for(int i=0;i<index-1;i++){
+                    for (int i = 0; i < index - 1; i++) {
                         output.write(bytes[i])
                     }
                     output.write(mainClass.size())
                     output.write(mainClass.getBytes())
-                    for(int i=index+1;i<bytes.size();i++){
+                    for (int i = index + 1; i < bytes.size(); i++) {
                         output.write(bytes[i])
                     }
                     output.flush()
                     output.close()
                 }
             }
-            project.tasks.create('cleanJar',Delete.class){del->
+            project.tasks.register('cleanJar',Delete.class){ del->
                 doFirst {
                     del.delete(project.buildDir.path+'/libs')
                 }
             }
-            project.tasks.create('cleanRemoteClass',Delete.class){del->
+            project.tasks.register('cleanRemoteClass',Delete.class){ del->
                 doFirst {
                     del.delete(clsTmpDir)
                 }
             }
             //编译并复制所有需要文件去临时目录
-            project.tasks.create('copyRemoteClass'){
+            project.tasks.register('copyRemoteClass'){
                 dependsOn('cleanRemoteClass')
                 def buildTypeUpper=buildTypeUpper(project)
                 //编译本项目
@@ -223,7 +223,7 @@ class Builder implements Plugin<Project>{
                 }
             }
             //打包整个远端类
-            project.tasks.create('buildRemoteJar',Jar.class){jar->
+            project.tasks.register('buildRemoteJar',Jar.class){ jar->
                 dependsOn('copyRemoteClass')
                 jar.archiveFileName.set("remote.jar")
                 doFirst {
@@ -233,7 +233,7 @@ class Builder implements Plugin<Project>{
                     jar.into('/')
                 }
             }
-            project.tasks.create('buildRunnerJar',Jar.class){jar->
+            project.tasks.register('buildRunnerJar',Jar.class){ jar->
                 mustRunAfter('cleanJar')
                 dependsOn(['copyBaseRunnerFileToBuild','buildRemoteJar'])
                 jar.archiveFileName.set(project.name+'.jar')
@@ -257,30 +257,30 @@ class Builder implements Plugin<Project>{
                     jar.into('/')
                 }
             }
-            project.tasks.create('buildRunnerDex', Exec.class){exec->
+            project.tasks.register('buildRunnerDex', Exec.class){ exec->
                 dependsOn(['cleanJar','buildRunnerJar'])
                 doFirst {
                     def buildToolVersion=project.extensions.findByName('android').getProperties()['buildToolsVersion']
-                    def dexFile=sdkDir+'/build-tools/'+buildToolVersion+'/dx'+(isWindows?'.bat':'')
 
+                    def d8File=sdkDir+'/build-tools/'+buildToolVersion+'/d8'+(isWindows?'.bat':'')
                     def srcFile=project.buildDir.path+'/libs/'+project.name+'.jar'
-                    def outFile=project.buildDir.path+'/assets/runner.dex'
+                    def outDir=project.buildDir.path+'/libs/'
 
-                    def assetsDir=new File(outFile).parentFile
-                    if(!assetsDir.exists()){
-                        assetsDir.mkdirs()
-                    }
-
-                    exec.executable(dexFile)
-                    exec.args(["--dex","--output",outFile,srcFile])
+                    exec.executable(d8File)
+                    exec.args(["--release","--output",outDir,srcFile])
                 }
             }
-
+            project.tasks.register("copyRunnerDex",Copy.class){
+                it.dependsOn('buildRunnerDex')
+                from(project.buildDir.path+'/libs/classes.dex')
+                into(project.buildDir.path+'/assets/')
+                rename("classes.dex","runner.dex")
+            }
         }
 
-        project.tasks.whenTaskAdded {
+        project.tasks.configureEach {
             if(it.name=='generateDebugAssets'||it.name=='generateReleaseAssets'){
-                it.dependsOn('buildRunnerDex')
+                it.dependsOn('copyRunnerDex')
             }
         }
 
