@@ -145,7 +145,7 @@ class Builder implements Plugin<Project>{
                     if (ext.debugModule == null) {
                         copyStreamToFile(this.class.getResource('/runner.jar').openStream(), baseRunnerPath)
                     } else {
-                        File src = new File(project.rootProject.project(ext.debugModule).buildDir.path + "/intermediates/aar_main_jar/release/classes.jar")
+                        File src = new File(project.rootProject.project(ext.debugModule).buildDir.path + "/intermediates/aar_main_jar/release/syncReleaseLibJars/classes.jar")
                         def input = new FileInputStream(src)
                         copyStreamToFile(input, baseRunnerPath)
                     }
